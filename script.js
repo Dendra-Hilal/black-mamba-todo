@@ -115,6 +115,32 @@ function deleteTask(id) {
     objectStore.delete(id);
 }
 
+// Fungsi untuk menghapus seluruh task di IndexedDB
+function deleteAllTasks() {
+    const transaction = database.transaction(['tasks'], 'readwrite');
+    const objectStore = transaction.objectStore('tasks');
+    const request = objectStore.clear(); // Menghapus semua data di object store
+
+    request.onsuccess = function() {
+        todoList.innerHTML = ''; // Menghapus semua item dari tampilan
+        console.log("All tasks have been deleted at midnight.");
+    };
+}
+
+// Fungsi untuk cek dan hapus task di pukul 12 malam
+function checkMidnight() {
+    const now = new Date();
+    if (now.getHours() === 0 && now.getMinutes() === 0) {
+        deleteAllTasks();
+    }
+}
+
+// Set interval untuk cek setiap menit
+setInterval(checkMidnight, 60000); // Cek setiap 1 menit (60000 ms)
+
+// Pastikan semua task terhapus jika jam baru melewati pukul 12 malam saat aplikasi dibuka
+checkMidnight();
+
 // Fungsi memperbarui status selesai task
 function updateTaskCompletion(id, completed) {
     const transaction = database.transaction(['tasks'], 'readwrite');
